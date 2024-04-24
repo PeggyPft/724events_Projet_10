@@ -7,7 +7,14 @@ import {
   useState,
 } from "react";
 
-const DataContext = createContext({});
+// Création du contexte avec une valeur par défaut pour last
+const DataContext = createContext({
+      last: {
+      cover: "",
+      title: "",
+      date: ""
+    }
+  });
 
 export const api = {
   loadData: async () => {
@@ -19,17 +26,22 @@ export const api = {
 export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  const getData = useCallback(async () => {
-    try {
-      setData(await api.loadData());
-    } catch (err) {
-      setError(err);
-    }
-  }, []);
-  useEffect(() => {
-    if (data) return;
-    getData();
-  });
+
+// Fonction pour récupérer les données
+const getData = useCallback(async () => {
+  try {
+    const fetchedData = await api.loadData();
+    console.log("Fetched Data:", fetchedData);
+    setData(fetchedData);
+  } catch (err) {
+    setError(err);
+  }
+}, []);
+
+// Appel de getData lors du montage du composant
+useEffect(() => {    
+  getData();    
+}, [getData]);
   
   return (
     <DataContext.Provider
@@ -37,6 +49,8 @@ export const DataProvider = ({ children }) => {
       value={{
         data,
         error,
+        // "last" est défini comme le dernier événement dans les données, s'il existe
+        last: data && data.events ? data.events[data.events.length - 1] : {}
       }}
     >
       {children}
