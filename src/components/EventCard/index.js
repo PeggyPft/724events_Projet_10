@@ -1,17 +1,23 @@
 import PropTypes from "prop-types";
 import { getMonth } from "../../helpers/Date";
+import { useData } from "../../contexts/DataContext/index";
 
 import "./style.scss";
 
 const EventCard = ({
-  imageSrc,
   imageAlt,
   date = new Date(),
-  title,
   label,
   small = false,
   ...props
-}) => (
+}) => {
+  const {last} = useData();
+
+  const imageSrc = last ? last.cover: "";
+  const title = last ? last.title: "";
+
+
+return (
     <div
       data-testid="card-testid"
       className={`EventCard${small ? " EventCard--small" : ""}`}
@@ -27,12 +33,11 @@ const EventCard = ({
       </div>
     </div>
   );
+};
 
 EventCard.propTypes = {
-  imageSrc: PropTypes.string.isRequired,
   imageAlt: PropTypes.string,
   date: PropTypes.instanceOf(Date).isRequired,
-  title: PropTypes.string.isRequired,
   small: PropTypes.bool,
   label: PropTypes.string.isRequired,
 };
